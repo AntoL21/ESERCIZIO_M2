@@ -1,0 +1,229 @@
+CREATE DATABASE toysgroup
+USE toysgroup;
+
+CREATE TABLE category (
+categoryID INT AUTO_INCREMENT PRIMARY KEY ,
+name_category VARCHAR (50)
+)
+AUTO_INCREMENT = 1;
+
+CREATE TABLE product (
+productID INT AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR (50) NOT NULL,
+stato VARCHAR (50) NOT NULL,
+cost DECIMAL (7,2) NOT NULL,
+color VARCHAR (50),
+size VARCHAR(50),
+categoryID INT,
+FOREIGN KEY (categoryID) REFERENCES category(categoryID)
+)AUTO_INCREMENT = 1;
+
+CREATE TABLE nation (
+nationID INT AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR (50)
+)AUTO_INCREMENT = 1;
+
+CREATE TABLE region (
+regionID INT AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR (50),
+nationID INT,
+FOREIGN KEY (nationID) REFERENCES nation(nationID),
+market VARCHAR (50)
+)AUTO_INCREMENT = 1;
+
+CREATE TABLE sales(
+orderID INT AUTO_INCREMENT PRIMARY KEY,
+qtasales INT NOT NULL,
+data_order DATE,
+data_shipping DATE,
+fee INT,
+productID INT,
+FOREIGN KEY (productID) REFERENCES product(productID),
+nationID INT,
+FOREIGN KEY (nationID) REFERENCES nation(nationID)
+)AUTO_INCREMENT = 1;
+
+# CHECK DI CREAZIONE DELLE TABELLE NEL DB E DELLA LORO COMPOSIZIONE
+SHOW TABLES;
+DESCRIBE category;
+DESCRIBE nation;
+DESCRIBE product;
+DESCRIBE region;
+DESCRIBE sales;
+
+#INSERIMENTO DEI DUMMI DATA
+INSERT INTO category (name_category) VALUES
+('SPORT'),
+('TECH'),
+('FASHION'),
+('CHRISTMAS'),
+('OLD'),
+('RETRO'),
+('BESTSELLER'),
+('NEWTREND')
+;
+
+
+INSERT INTO product (nome, stato, cost, color, size, categoryID) VALUES
+('T-shirt Sportiva', 'disponibile', 19.99, 'rosso', 'M', 1),
+('Smartphone X1', 'esaurito', 299.99, 'nero', 'M', 2),
+('Jeans Slim Fit', 'disponibile', 49.50, 'blu', 'L', 1),
+('Laptop Ultra', 'disponibile', 899.00, 'grigio', 'M', 2),
+('Sneakers Run', 'in arrivo', 75.00, 'bianco', 'S', 3),
+('Orologio Digitale', 'disponibile', 39.99, 'nero', 'M', 2),
+('Giacca Invernale', 'esaurito', 120.00, 'verde', 'XL', 1),
+('Tablet Mini', 'disponibile', 199.90, 'argento', 'N/A', 2),
+('Libro Fantasy', 'disponibile', 14.20, 'multicolore', 'N/A', 4),
+('Zaino Trekking', 'in arrivo', 59.00, 'marrone', 'unica', 3);
+
+INSERT INTO nation (nome) VALUES
+('ITALY'),
+('FRANCE'),
+('CANADA'),
+('KOREA'),
+('USA'),
+('CHINA'),
+('MAROCCO'),
+('WALES'),
+('SPAIN'),
+('CHILE'),
+('JAPAN')
+;
+
+INSERT INTO region (nationID, market) VALUES
+(1, 'Amazon'),
+(2, 'eBay'),
+(3, 'Alibaba'),
+(4, 'Rakuten'),
+(5, 'Etsy'),
+(6, 'Zalando'),
+(7, 'MercadoLibre'),
+(8, 'Shopee'),
+(9, 'Coupang'),
+(10, 'JD.com')
+;
+select * from product;
+INSERT INTO sales (qtasales, data_order, data_shipping, fee, productID, nationID) VALUES
+(2, '2025-06-01', '2025-06-04', 5.99, 1, 1),
+(1, '2025-06-02', NULL, 3.50, 2, 2),
+(3, '2025-06-03', '2025-06-07', NULL, 3, 3),
+(5, '2025-06-04', '2025-06-08', 4.00, 4, 4),
+(5, '2025-06-05', NULL, 10.00, 5, 5),
+(2, '2025-06-06', '2025-06-09', 6.00, NULL, 6),
+(4, '2025-06-07', NULL, NULL, 7, 7),
+(1, '2025-06-08', '2025-06-12', 3.00, 8, NULL),
+(2, '2025-06-09', '2025-06-13', 5.75, 9, 9),
+(3, NULL, NULL, 9.00, 10, 10),
+(12, '2025-05-28', '2025-05-30', NULL, 1, 3),
+(2, '2025-05-29', NULL, 4.50, 2, 4),
+(1, '2025-05-30', '2025-06-02', 2.99, 3, 5),
+(3, '2025-05-31', NULL, NULL, 4, 6),
+(2, '2025-06-01', '2025-06-05', 7.20, NULL, 7),
+(1, '2025-06-02', NULL, 5.00, 5, NULL),
+(4, '2025-06-03', '2025-06-06', 6.40, 6, 2),
+(2, NULL, NULL, NULL, 7, 1),
+(3, '2025-06-05', '2025-06-08', 8.90, 8, 3),
+(1, '2025-06-06', NULL, 3.10, 9, 4);
+INSERT INTO sales (qtasales, data_order, data_shipping, fee, productID, nationID) VALUES
+(2, '2025-06-01', '2025-06-04', 5.99, 1, 1),
+(1, '2025-06-02', '2025-06-05', 3.50, 2, 3),
+(3, '2025-06-03', '2025-06-07', 7.25, 3, 2),
+(1, '2025-06-04', '2025-06-08', 4.00, 4, 5),
+(5, '2025-06-05', '2025-06-10', 10.00, 5, 4),
+(2, '2025-06-06', '2025-06-09', 6.00, 6, 6),
+(4, '2025-06-07', '2025-06-11', 8.50, 7, 7),
+(1, '2025-06-08', '2025-06-12', 3.00, 8, 9),
+(2, '2025-06-09', '2025-06-13', 5.75, 9, 8),
+(3, '2025-06-10', '2025-06-14', 9.00, 10, 10);
+
+
+# EVIDENZIAMO I DOC DI VENDITA LE DATE E SE I PAGAMENTI SONO FUORI SLA
+SELECT orderID AS doc , data_order AS data_doc , p.nome , n.nome as nazione, market as regione_mercato, DATEDIFF(CURDATE(), data_order) > 180 AS fuori_SLA
+FROM sales s
+JOIN product p ON s.productID = p.productID
+JOIN nation n ON s.nationID = n.nationID
+JOIN region r ON s.nationID = r.nationID
+WHERE data_order IS NOT NULL
+;
+
+
+# EVIDENZIAMO DEI SOLI PRODOTTI VENDUTI I PIU VENDUTI 
+SELECT p.nome , SUM(cost)
+FROM sales AS s
+JOIN product p ON s.productID = p.productID
+WHERE data_order IS NOT NULL
+GROUP BY p.nome
+ORDER BY SUM(cost) DESC
+;
+
+
+/* questa query mostra la somma dei prodotti venduti
+relazionandola alla media di vendite di quest'anno mostrando solo quelli che hanno
+un tot vendite maggiore della media
+aggiungendo -1 allo script : WHERE YEAR(data_order) = YEAR(CURDATE()) 
+otteniamo la media dell'anno scorso */
+SELECT 
+  s.productID as codice_prodotto, SUM(s.qtasales) AS tot_venduto
+FROM sales AS s
+JOIN product p ON s.productID = p.productID
+WHERE YEAR(s.data_order) = YEAR(CURDATE())
+GROUP BY s.productID
+HAVING SUM(s.qtasales) > (
+  SELECT AVG(qtas)
+  FROM (
+    SELECT SUM(s2.qtasales) AS qtas
+    FROM sales AS s2
+    WHERE YEAR(s2.data_order) = YEAR(CURDATE())
+    GROUP BY s2.productID
+  ) AS vendite_per_prodotto
+);
+
+
+# questa query mostra il tot.fatturato per anno
+# ho sbagliato nella costruzione del DB
+SELECT YEAR(s.data_order) AS anno, n.nome AS nazione, SUM(p.cost * s.qtasales) AS totale_fatturato
+FROM sales AS s
+JOIN product p ON s.productID = p.productID
+JOIN nation n ON s.nationID = n.nationID
+GROUP BY anno, nazione
+ORDER BY totale_fatturato DESC
+;
+
+#query per mostrare i prodotti più richiesti
+SELECT  s.productID, p.nome, SUM(s.qtasales) AS tot_venduto
+FROM sales AS s
+JOIN product p ON s.productID = p.productID
+WHERE s.data_order IS NOT NULL
+GROUP BY s.productID, p.nome
+ORDER BY tot_venduto DESC
+;
+
+
+/* i 2 prodotti meno venduti sono evidenziati da questa query
+applicare uno sconto fuori stagione
+customizzazione dei prodotti */
+
+SELECT  s.productID, p.nome, SUM(s.qtasales) AS tot_venduto
+FROM sales AS s
+JOIN product p ON s.productID = p.productID
+WHERE s.data_order IS NULL
+GROUP BY s.productID, p.nome
+ORDER BY tot_venduto DESC
+;
+#query per la View 1
+CREATE VIEW prodotti AS
+SELECT p.productID AS codice_prodotto, p.nome AS nome_prodotto, name_category AS nome_categoria
+FROM product p
+JOIN category c ON p.categoryID = c.categoryID;
+
+SELECT * FROM prodotti;
+# Query per la View2
+CREATE VIEW informazioni_territorio AS
+SELECT r.regionID AS codice_regione, n.nome as stato, market 
+FROM region r
+JOIN nation n ON r.nationID = n.nationID;
+
+SELECT * FROM informazioni_territorio;
+
+/* Grazie,
+Antonio Longo */
